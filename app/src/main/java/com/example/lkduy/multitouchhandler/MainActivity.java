@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity implements CustomTouchContai
 
     CustomTouchContainer mainTouchContainer;
     private OkHttpClient client = new OkHttpClient();
-    private String serverAddress = "192.168.0.100:8080";
+    private String serverAddress = "192.168.0.102:8080";
     CustomWebSocketListener wsListener = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -23,9 +23,9 @@ public class Utilities {
                 pointerJSObj.put("RelVeloY",pointer.getRelVeloY());
                 jsonArray.put(pointerJSObj);
             }
-            if(avaiPointers.size()>0){
-                eventJSONObj.put("Pointers",jsonArray);
-            }
+            //if(avaiPointers.size()>0){
+                eventJSONObj.put("AvaiPointers",jsonArray);
+            //}
         } catch (JSONException e) {
             e.printStackTrace();
         }
