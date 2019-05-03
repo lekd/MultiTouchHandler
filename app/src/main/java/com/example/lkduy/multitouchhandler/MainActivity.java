@@ -1,8 +1,20 @@
 package com.example.lkduy.multitouchhandler;
 
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
 
 import java.util.List;
 
@@ -15,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements CustomTouchContai
     CustomTouchContainer mainTouchContainer;
     private OkHttpClient client = new OkHttpClient();
     private String serverAddress = "192.168.0.102:8080";
+    Context mainContext = this;
     CustomWebSocketListener wsListener = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,9 +35,37 @@ public class MainActivity extends AppCompatActivity implements CustomTouchContai
         setContentView(R.layout.activity_main);
         mainTouchContainer = (CustomTouchContainer)findViewById(R.id.mainTouchContainer);
         mainTouchContainer.setTouchListener(this);
-        start();
+        ShowServerIPInputDialog();
     }
-    void start(){
+    @Override
+    public  void onStart()
+    {
+        super.onStart();
+
+    }
+    void ShowServerIPInputDialog(){
+        final Dialog serverAddressDlg = new Dialog(mainContext);
+        serverAddressDlg.setContentView(R.layout.server_address_dlg);
+        Button btnSave = serverAddressDlg.findViewById(R.id.serverDlg_btnSave);
+        final EditText addressEditText = serverAddressDlg.findViewById(R.id.serverDlg_editAddress);
+        btnSave.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                if(!addressEditText.getText().toString().isEmpty()){
+                    serverAddress = addressEditText.getText().toString();
+                    startNetworkConnection();
+                    serverAddressDlg.dismiss();
+                }
+            }
+        });
+        serverAddressDlg.setCancelable(false);
+        Window dlgWindow = serverAddressDlg.getWindow();
+        dlgWindow.setLayout(WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT);
+        dlgWindow.setGravity(Gravity.CENTER);
+        serverAddressDlg.show();
+
+    }
+    void startNetworkConnection(){
         String serverURL = String.format("ws://%s/main.html",serverAddress);
         Request wsRequest = new Request.Builder().url(serverURL).build();
         wsListener = new CustomWebSocketListener();

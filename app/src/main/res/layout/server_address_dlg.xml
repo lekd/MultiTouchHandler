@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/serverDlg_controlContainers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/serverDlg_tvLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Server address (IP:port):"/>
+        <EditText
+            android:id="@+id/serverDlg_editAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/serverDlg_btnSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+    </LinearLayout>
+</RelativeLayout>
