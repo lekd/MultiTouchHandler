@@ -15,6 +15,9 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import 	android.os.Handler;
 
 public class CustomTouchContainer extends View {
     Context context;
@@ -57,10 +60,17 @@ public class CustomTouchContainer extends View {
         super.onDraw(canvas);
     }
     int preTouchCount = 0;
+    //Timer checkGhostPointerTimer;
+    Handler ghostPointerRemover;
     @Override
     public boolean onTouchEvent( MotionEvent event){
         int action = event.getActionMasked();
         int eventType = -1;
+        if(ghostPointerRemover != null)
+        {
+            ghostPointerRemover.removeCallbacks(removeGhostPointerRunnable);
+            ghostPointerRemover = null;
+        }
         switch (action) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_POINTER_DOWN:
@@ -105,9 +115,35 @@ public class CustomTouchContainer extends View {
         }
         if(touchNotifier != null){
             touchNotifier.TouchEventArose(eventType,avaiPointers);
+            if(eventType == 2 && avaiPointers.size()==1){
+                //checkGhostPointerTimer = new Timer();
+                //checkGhostPointerTimer.schedule(removeGhostPointerTask,100);
+                ghostPointerRemover = new Handler();
+                ghostPointerRemover.postDelayed(removeGhostPointerRunnable,100);
+            }
         }
         return true;
     }
+    TimerTask removeGhostPointerTask = new TimerTask() {
+        @Override
+        public void run() {
+            List<TouchPointer> avaiPointers = new ArrayList<>();
+            touchNotifier.TouchEventArose(2,avaiPointers);
+            preTouchCount = 0;
+            pointersLocs = new ArrayList<>();
+
+        }
+    };
+    Runnable removeGhostPointerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            List<TouchPointer> avaiPointers = new ArrayList<>();
+            touchNotifier.TouchEventArose(2,avaiPointers);
+            preTouchCount = 0;
+            pointersLocs = new ArrayList<>();
+            invalidate();
+        }
+    };
     void storeCurrentPointers(MotionEvent ev){
         pointersLocs.clear();
         for(int p=0; p<ev.getPointerCount(); p++){
