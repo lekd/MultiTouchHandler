@@ -5,6 +5,7 @@ import android.util.Log;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
+import okio.ByteString;
 
 public class CustomWebSocketListener extends WebSocketListener{
     private String TAG = "CustomWebSocketClient";
@@ -32,6 +33,13 @@ public class CustomWebSocketListener extends WebSocketListener{
     }
     public void sendMessage(String msg){
         if(mWebSocket != null){
+            mWebSocket.send(msg);
+        }
+    }
+    public  void sendBytes(byte[] data){
+        if(mWebSocket != null){
+            ByteString msg = ByteString.of(data,0,data.length);
+            //Log.i("MessageSize", String.valueOf(msg.size()));
             mWebSocket.send(msg);
         }
     }

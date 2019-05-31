@@ -18,8 +18,7 @@ public class StreamingTask extends AsyncTask<Object,Object,Boolean> {
         Bitmap currentFrame = (Bitmap)objects[1];
         try
         {
-            Log.i("StreamingTask","IsCalled");
-            byte[] bmpData = Utilities.getBytesFromBitmap(currentFrame,false);
+            byte[] bmpData = Utilities.getBytesFromBitmap(currentFrame,true,10);
             writerManager.StreamFrameData(bmpData);
         }
         catch (Exception ex)

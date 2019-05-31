@@ -1,5 +1,7 @@
 package com.example.lkduy.multitouchhandler;
 
+import java.nio.ByteBuffer;
+
 public class TouchPointer {
     public int getPointerID() {
         return pointerID;
@@ -56,4 +58,18 @@ public class TouchPointer {
         relX = relY = 0;
         relVeloX = relVeloY = 0;
     }
+
+    public static int BYTESIZE = 20;
+    public byte[] getByteArray(){
+        ByteBuffer buffer = ByteBuffer.allocate(BYTESIZE);
+        byte[] valBuffer;
+        valBuffer = Utilities.Integer2ByteBufferLITTLE_GENDIAN(pointerID);
+        buffer.put(Utilities.Integer2ByteBufferLITTLE_GENDIAN(pointerID));
+        buffer.put(Utilities.Float2ByteBufferLITTLE_GENDIAN(relX));
+        buffer.put(Utilities.Float2ByteBufferLITTLE_GENDIAN(relY));
+        buffer.put(Utilities.Float2ByteBufferLITTLE_GENDIAN(relVeloX));
+        buffer.put(Utilities.Float2ByteBufferLITTLE_GENDIAN(relVeloY));
+        return buffer.array();
+    }
+
 }

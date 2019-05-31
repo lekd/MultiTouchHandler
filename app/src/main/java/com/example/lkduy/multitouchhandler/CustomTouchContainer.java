@@ -22,6 +22,7 @@ import 	android.os.Handler;
 public class CustomTouchContainer extends View {
     Context context;
     Paint blackPaint;
+    Paint bluePaint;
     Paint highlightPaint;
     List<Point> pointersLocs = new ArrayList<Point>();
     int fingerVizRadius = 100;
@@ -44,13 +45,16 @@ public class CustomTouchContainer extends View {
         blackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         blackPaint.setColor(Color.BLACK);
         blackPaint.setStyle(Paint.Style.FILL);
+        bluePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        bluePaint.setColor(Color.BLUE);
+        bluePaint.setStyle(Paint.Style.FILL);
         highlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        highlightPaint.setColor(Color.RED);
+        highlightPaint.setColor(Color.CYAN);
         highlightPaint.setStyle(Paint.Style.FILL);
     }
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawRect(new Rect(0, 0, this.getWidth(), this.getHeight()), blackPaint);
+        canvas.drawRect(new Rect(0, 0, this.getWidth(), this.getHeight()), bluePaint);
         if (preTouchCount > 0) {
             for (int i = 0; i < pointersLocs.size(); i++) {
                 Point pos = pointersLocs.get(i);

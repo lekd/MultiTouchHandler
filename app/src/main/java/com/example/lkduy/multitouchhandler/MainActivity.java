@@ -17,6 +17,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -27,6 +28,7 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -53,15 +55,18 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private OkHttpClient client = new OkHttpClient();
     Context mainContext = this;
     private CameraBridgeViewBase mOpenCvCameraView;
+    ImageView imvExtractionPreview;
     Thread streamingServerThread;
     MjpegWriterManager mjpegWriterManager;
 
     CustomWebSocketListener wsListener = null;
     CustomTouchContainer mainTouchContainer;
-
+    HandExtractor handExtractor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mOpenCvCameraView = (CameraBridgeViewBase)findViewById(R.id.main_openCVCamView);
@@ -69,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         TextView tvIP = (TextView)findViewById(R.id.tv_myAddress);
         tvIP.setText(String.format("%s:%d", Utilities.getIPAddress(this,true),STREAMING_PORT));
+        imvExtractionPreview = (ImageView)findViewById(R.id.imv_handPreview);
 
         StreamingServer server = new StreamingServer(STREAMING_PORT);
         server.setEventListener(this);
@@ -79,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
         mainTouchContainer = (CustomTouchContainer)findViewById(R.id.mainTouchContainer);
         mainTouchContainer.setTouchListener(this);
+        handExtractor = new HandExtractor();
     }
     private BaseLoaderCallback loaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -173,36 +180,58 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     }
     boolean readyToSend = true;
+    Mat cropped = null;
+    Rect roi = null;
+    Mat extractedFromFrame;
+    float downSizeFactor = 2;
+    float downscaleFactor4Streaming = 12;
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         Mat originFrame = inputFrame.rgba();
         Mat rotated = new Mat();
-        Core.flip(originFrame.t(),rotated,0);
+        Core.flip(originFrame.t(),rotated,-1);
+        if(roi == null){
+            roi = new Rect(0,0,rotated.width(),rotated.height()/2);
+        }
+        cropped = new Mat(rotated,roi);
+        cropped = Utilities.downSizeMat(cropped,downSizeFactor);
+        extractedFromFrame = handExtractor.extractHandOnScreen(cropped,(int)(mainTouchContainer.getWidth()/downSizeFactor),(int)(mainTouchContainer.getHeight()/downSizeFactor));
         //originFrame.copyTo(rotated);
-        Bitmap frameBmp = Utilities.getBitmapOfMat(rotated,false);
-        Bitmap scaledDown = Utilities.downSizeBitmap(frameBmp,4,4);
-        if(readyToSend)
-        {
-            StreamingTask streamingTask = new StreamingTask();
-            streamingTask.setEventListener(this);
-            streamingTask.execute(mjpegWriterManager, Bitmap.createBitmap(scaledDown));
-            readyToSend = false;
+        if(extractedFromFrame != null){
+            Bitmap frameBmp = Utilities.getBitmapOfMat(extractedFromFrame,true, 100);
+            final Bitmap scaledDown = Utilities.downSizeBitmap(frameBmp,downscaleFactor4Streaming,downscaleFactor4Streaming);
+            /*runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    imvExtractionPreview.setImageBitmap(scaledDown);
+                }
+            });*/
+            if(readyToSend)
+            {
+                StreamingTask streamingTask = new StreamingTask();
+                streamingTask.setEventListener(this);
+                streamingTask.execute(mjpegWriterManager, Bitmap.createBitmap(scaledDown));
+                readyToSend = false;
+            }
         }
         return originFrame;
     }
 
     @Override
     public void TouchEventArose(int eventType, List<TouchPointer> avaiPointers) {
-        String jsonStr = Utilities.getJSONStringOfTouchEvent(eventType,avaiPointers);
-        Log.i("EventJSON",jsonStr);
-        wsListener.sendMessage(jsonStr);
+        //String jsonStr = Utilities.getJSONStringOfTouchEvent(eventType,avaiPointers);
+        //Log.i("EventJSON",jsonStr);
+        //wsListener.sendMessage(jsonStr);
+        byte[] byteData = Utilities.getByteDataOfTouchEvent(eventType,avaiPointers);
+        wsListener.sendBytes(byteData);
     }
     @Override
     public void ClientConnectedEvent(Socket clientSock) {
         try
         {
-            DataOutputStream clientStream = new DataOutputStream(clientSock.getOutputStream());
-            MjpegWriter writer = new MjpegWriter(clientStream);
+            DataOutputStream sendStream = new DataOutputStream(clientSock.getOutputStream());
+            DataInputStream recvStream = new DataInputStream(clientSock.getInputStream());
+            MjpegWriter writer = new MjpegWriter(sendStream,recvStream);
             mjpegWriterManager.AddWriter(writer);
         }
         catch (Exception ex)
