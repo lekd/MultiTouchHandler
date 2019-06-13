@@ -70,17 +70,17 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mOpenCvCameraView = (CameraBridgeViewBase)findViewById(R.id.main_openCVCamView);
-        mOpenCvCameraView.setCvCameraViewListener(this);
+        //mOpenCvCameraView.setCvCameraViewListener(this);
 
-        TextView tvIP = (TextView)findViewById(R.id.tv_myAddress);
+        /*TextView tvIP = (TextView)findViewById(R.id.tv_myAddress);
         tvIP.setText(String.format("%s:%d", Utilities.getIPAddress(this,true),STREAMING_PORT));
-        imvExtractionPreview = (ImageView)findViewById(R.id.imv_handPreview);
+        imvExtractionPreview = (ImageView)findViewById(R.id.imv_handPreview);*/
 
-        StreamingServer server = new StreamingServer(STREAMING_PORT);
+        /*StreamingServer server = new StreamingServer(STREAMING_PORT);
         server.setEventListener(this);
         streamingServerThread = new Thread(server);
         streamingServerThread.start();
-        mjpegWriterManager = new MjpegWriterManager();
+        mjpegWriterManager = new MjpegWriterManager();*/
         ShowServerIPInputDialog();
 
         mainTouchContainer = (CustomTouchContainer)findViewById(R.id.mainTouchContainer);
