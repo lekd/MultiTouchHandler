@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        mOpenCvCameraView = (CameraBridgeViewBase)findViewById(R.id.main_openCVCamView);
+        //mOpenCvCameraView = (CameraBridgeViewBase)findViewById(R.id.main_openCVCamView);
         //mOpenCvCameraView.setCvCameraViewListener(this);
 
         /*TextView tvIP = (TextView)findViewById(R.id.tv_myAddress);
@@ -95,7 +95,10 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS:
                     Log.i(TAG, "OpenCV loaded successfully");
-                    mOpenCvCameraView.enableView();
+                    if(mOpenCvCameraView != null)
+                    {
+                        mOpenCvCameraView.enableView();
+                    }
                     break;
                 default:
                     super.onManagerConnected(status);
@@ -111,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, loaderCallback);
         } else {
             Log.i(TAG, "OpenCV library found inside package. Using it");
-            loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+            //loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
 
     }
@@ -134,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         if (mOpenCvCameraView != null) {
             mOpenCvCameraView.disableView();
         }
-        streamingServerThread.interrupt();
+        //streamingServerThread.interrupt();
         if(wsListener != null){
             client.dispatcher().executorService().shutdown();
         }

@@ -6,11 +6,13 @@
     android:layout_height="match_parent"
     android:background="#000000"
     tools:context=".MainActivity">
+    <!--
     <org.opencv.android.JavaCameraView android:id="@+id/main_openCVCamView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha="0"
         app:camera_id="1"/>
+        -->
     <com.example.lkduy.multitouchhandler.CustomTouchContainer
         android:id="@+id/mainTouchContainer"
         android:layout_width="match_parent"
