@@ -50,8 +50,8 @@ public class CustomTouchContainer extends View {
         bluePaint.setColor(Color.BLUE);
         bluePaint.setStyle(Paint.Style.FILL);
         highlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        //highlightPaint.setColor(Color.CYAN);
-        highlightPaint.setColor(Color.rgb(20,255,125));
+        highlightPaint.setColor(Color.CYAN);
+        //highlightPaint.setColor(Color.rgb(20,255,125));
         highlightPaint.setStyle(Paint.Style.FILL);
         greenPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         greenPaint.setColor(Color.rgb(24,255,1));
@@ -59,7 +59,7 @@ public class CustomTouchContainer extends View {
     }
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawRect(new Rect(0, 0, this.getWidth(), this.getHeight()), greenPaint);
+        canvas.drawRect(new Rect(0, 0, this.getWidth(), this.getHeight()), bluePaint);
         if (preTouchCount > 0) {
             for (int i = 0; i < pointersLocs.size(); i++) {
                 Point pos = pointersLocs.get(i);
